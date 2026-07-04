@@ -55,19 +55,20 @@ export default function CreatePage() {
   };
 
   const inputClass =
-    "rounded-xl border border-black/10 bg-white p-3 text-sm dark:border-white/10 dark:bg-zinc-900";
-  const labelClass = "text-sm font-medium text-zinc-700 dark:text-zinc-300";
+    "rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white placeholder:text-purple-200/30 backdrop-blur-sm outline-none transition-colors focus:border-fuchsia-400/50 focus:ring-1 focus:ring-fuchsia-400/50";
+  const labelClass = "text-sm font-medium text-purple-100/90";
 
   return (
-    <div className="flex flex-1 flex-col items-center bg-zinc-50 px-6 py-16 font-sans dark:bg-black">
-      <div className="w-full max-w-2xl">
-        <Link href="/" className="text-sm text-zinc-500 hover:underline">
+    <div className="relative flex flex-1 flex-col items-center overflow-hidden px-6 py-16 font-sans">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_10%,rgba(217,70,239,0.18),transparent_45%),radial-gradient(circle_at_85%_30%,rgba(34,211,238,0.15),transparent_45%)]" />
+      <div className="relative w-full max-w-2xl">
+        <Link href="/" className="text-sm text-purple-300/70 hover:text-fuchsia-300 hover:underline">
           ← Back
         </Link>
-        <h1 className="mt-4 text-3xl font-semibold tracking-tight text-black dark:text-zinc-50">
+        <h1 className="mt-4 bg-gradient-to-r from-fuchsia-300 to-cyan-300 bg-clip-text text-3xl font-bold tracking-tight text-transparent">
           Create a New Bio
         </h1>
-        <p className="mt-2 text-zinc-600 dark:text-zinc-400">
+        <p className="mt-2 text-purple-200/70">
           Answer a few questions and we&apos;ll write an industry-standard bio
           from scratch.
         </p>
@@ -145,7 +146,7 @@ export default function CreatePage() {
                 className={inputClass}
               >
                 {Object.entries(PURPOSE_LABELS).map(([value, label]) => (
-                  <option key={value} value={value}>
+                  <option key={value} value={value} className="bg-[#170f26] text-white">
                     {label}
                   </option>
                 ))}
@@ -162,12 +163,12 @@ export default function CreatePage() {
               />
             </label>
 
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <p className="text-sm text-red-400">{error}</p>}
 
             <button
               type="submit"
               disabled={loading}
-              className="mt-2 rounded-full bg-foreground px-6 py-3 text-sm font-medium text-background transition-colors hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+              className="mt-2 rounded-full bg-gradient-to-r from-fuchsia-500 to-cyan-500 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-fuchsia-500/20 transition-opacity hover:opacity-90 disabled:opacity-50"
             >
               {loading ? "Writing..." : "Create My Bio"}
             </button>
@@ -179,7 +180,7 @@ export default function CreatePage() {
             <BioResult bio={bio} onRegenerate={generate} regenerating={loading} />
             <button
               onClick={() => setBio(null)}
-              className="text-sm text-zinc-500 hover:underline"
+              className="text-sm text-purple-300/70 hover:text-fuchsia-300 hover:underline"
             >
               ← Edit inputs
             </button>

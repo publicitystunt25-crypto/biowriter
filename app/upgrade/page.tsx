@@ -40,58 +40,57 @@ export default function UpgradePage() {
     generate();
   };
 
+  const inputClass =
+    "rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white placeholder:text-purple-200/30 backdrop-blur-sm outline-none transition-colors focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50";
+  const labelClass = "text-sm font-medium text-purple-100/90";
+
   return (
-    <div className="flex flex-1 flex-col items-center bg-zinc-50 px-6 py-16 font-sans dark:bg-black">
-      <div className="w-full max-w-2xl">
-        <Link href="/" className="text-sm text-zinc-500 hover:underline">
+    <div className="relative flex flex-1 flex-col items-center overflow-hidden px-6 py-16 font-sans">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_10%,rgba(251,191,36,0.15),transparent_45%),radial-gradient(circle_at_85%_30%,rgba(217,70,239,0.15),transparent_45%)]" />
+      <div className="relative w-full max-w-2xl">
+        <Link href="/" className="text-sm text-purple-300/70 hover:text-amber-300 hover:underline">
           ← Back
         </Link>
-        <h1 className="mt-4 text-3xl font-semibold tracking-tight text-black dark:text-zinc-50">
+        <h1 className="mt-4 bg-gradient-to-r from-amber-300 to-fuchsia-300 bg-clip-text text-3xl font-bold tracking-tight text-transparent">
           Upgrade My Bio
         </h1>
-        <p className="mt-2 text-zinc-600 dark:text-zinc-400">
+        <p className="mt-2 text-purple-200/70">
           Paste your current bio below and tell us where it&apos;ll be used.
         </p>
 
         {!bio && (
           <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-5">
             <label className="flex flex-col gap-2">
-              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Current bio
-              </span>
+              <span className={labelClass}>Current bio</span>
               <textarea
                 required
                 value={currentBio}
                 onChange={(e) => setCurrentBio(e.target.value)}
                 rows={8}
                 placeholder="Paste your existing bio here..."
-                className="rounded-xl border border-black/10 bg-white p-4 text-sm dark:border-white/10 dark:bg-zinc-900"
+                className={inputClass}
               />
             </label>
 
             <label className="flex flex-col gap-2">
-              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Genre (optional)
-              </span>
+              <span className={labelClass}>Genre (optional)</span>
               <input
                 value={genre}
                 onChange={(e) => setGenre(e.target.value)}
                 placeholder="e.g. Alt-pop, Hip-hop, Country"
-                className="rounded-xl border border-black/10 bg-white p-3 text-sm dark:border-white/10 dark:bg-zinc-900"
+                className={inputClass}
               />
             </label>
 
             <label className="flex flex-col gap-2">
-              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Where will this bio be used?
-              </span>
+              <span className={labelClass}>Where will this bio be used?</span>
               <select
                 value={purpose}
                 onChange={(e) => setPurpose(e.target.value as Purpose)}
-                className="rounded-xl border border-black/10 bg-white p-3 text-sm dark:border-white/10 dark:bg-zinc-900"
+                className={inputClass}
               >
                 {Object.entries(PURPOSE_LABELS).map(([value, label]) => (
-                  <option key={value} value={value}>
+                  <option key={value} value={value} className="bg-[#170f26] text-white">
                     {label}
                   </option>
                 ))}
@@ -99,23 +98,23 @@ export default function UpgradePage() {
             </label>
 
             <label className="flex flex-col gap-2">
-              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              <span className={labelClass}>
                 Anything specific to keep or emphasize? (optional)
               </span>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
-                className="rounded-xl border border-black/10 bg-white p-3 text-sm dark:border-white/10 dark:bg-zinc-900"
+                className={inputClass}
               />
             </label>
 
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <p className="text-sm text-red-400">{error}</p>}
 
             <button
               type="submit"
               disabled={loading}
-              className="mt-2 rounded-full bg-foreground px-6 py-3 text-sm font-medium text-background transition-colors hover:bg-[#383838] disabled:opacity-50 dark:hover:bg-[#ccc]"
+              className="mt-2 rounded-full bg-gradient-to-r from-amber-400 to-fuchsia-500 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-fuchsia-500/20 transition-opacity hover:opacity-90 disabled:opacity-50"
             >
               {loading ? "Rewriting..." : "Upgrade My Bio"}
             </button>
@@ -127,7 +126,7 @@ export default function UpgradePage() {
             <BioResult bio={bio} onRegenerate={generate} regenerating={loading} />
             <button
               onClick={() => setBio(null)}
-              className="text-sm text-zinc-500 hover:underline"
+              className="text-sm text-purple-300/70 hover:text-amber-300 hover:underline"
             >
               ← Edit inputs
             </button>

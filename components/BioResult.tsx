@@ -22,27 +22,27 @@ export default function BioResult({
   const wordCount = bio.trim().split(/\s+/).filter(Boolean).length;
 
   return (
-    <div className="w-full max-w-2xl rounded-2xl border border-black/10 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-zinc-900">
+    <div className="w-full max-w-2xl rounded-2xl border border-white/10 bg-white/5 p-6 shadow-lg shadow-fuchsia-500/10 backdrop-blur-sm">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+        <h2 className="bg-gradient-to-r from-fuchsia-300 to-cyan-300 bg-clip-text text-sm font-semibold uppercase tracking-wide text-transparent">
           Your Bio
         </h2>
-        <span className="text-xs text-zinc-400">{wordCount} words</span>
+        <span className="text-xs text-purple-200/50">{wordCount} words</span>
       </div>
-      <p className="whitespace-pre-wrap text-base leading-7 text-zinc-800 dark:text-zinc-100">
+      <p className="whitespace-pre-wrap text-base leading-7 text-purple-50">
         {bio}
       </p>
       <div className="mt-6 flex gap-3">
         <button
           onClick={handleCopy}
-          className="rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
+          className="rounded-full bg-gradient-to-r from-fuchsia-500 to-cyan-500 px-5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
         >
           {copied ? "Copied!" : "Copy Bio"}
         </button>
         <button
           onClick={onRegenerate}
           disabled={regenerating}
-          className="rounded-full border border-black/10 px-5 py-2 text-sm font-medium transition-colors hover:bg-black/[.04] disabled:opacity-50 dark:border-white/15 dark:hover:bg-white/[.08]"
+          className="rounded-full border border-white/15 px-5 py-2 text-sm font-medium text-purple-100 transition-colors hover:bg-white/10 disabled:opacity-50"
         >
           {regenerating ? "Regenerating..." : "Regenerate"}
         </button>
