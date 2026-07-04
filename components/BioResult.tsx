@@ -44,7 +44,7 @@ export default function BioResult({
           disabled={regenerating}
           className="rounded-full border border-white/15 px-5 py-2 text-sm font-medium text-purple-100 transition-colors hover:bg-white/10 disabled:opacity-50"
         >
-          {regenerating ? "Regenerating..." : "Regenerate"}
+          {regenerating ? "Writing a different version..." : "Give Me a Different Version"}
         </button>
       </div>
     </div>
