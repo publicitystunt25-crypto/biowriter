@@ -4,6 +4,10 @@ import type { NextAuthConfig } from "next-auth";
 // No providers/adapters here — anything using bcrypt or the Postgres
 // driver must stay out of this file so middleware (Edge runtime) can import it.
 export const authConfig: NextAuthConfig = {
+  // Required outside Vercel (Render, Railway, Docker, etc.) — Auth.js can't
+  // auto-verify the request Host header against a trusted list otherwise,
+  // and rejects every request with a generic "server configuration" error.
+  trustHost: true,
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
