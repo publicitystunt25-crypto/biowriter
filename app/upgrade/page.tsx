@@ -4,11 +4,19 @@ import { useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import BioResult from "@/components/BioResult";
-import { getPurposeLabels, type Purpose, type UpgradeInput } from "@/lib/bio-prompt";
+import {
+  getPurposeLabels,
+  getCreateFieldLabels,
+  CATEGORY_LABELS,
+  type Purpose,
+  type Category,
+  type UpgradeInput,
+} from "@/lib/bio-prompt";
 
 export default function UpgradePage() {
   const { data: session, status } = useSession();
-  const purposeLabels = getPurposeLabels("artist");
+
+  const [category, setCategory] = useState<Category | null>(null);
 
   const [currentBio, setCurrentBio] = useState("");
   const [genre, setGenre] = useState("");
@@ -21,11 +29,12 @@ export default function UpgradePage() {
   const [errorCode, setErrorCode] = useState<string | null>(null);
 
   const generate = async () => {
+    if (!category) return;
     setLoading(true);
     setError(null);
     setErrorCode(null);
     try {
-      const input: UpgradeInput = { mode: "upgrade", currentBio, genre, purpose, notes };
+      const input: UpgradeInput = { mode: "upgrade", category, currentBio, genre, purpose, notes };
       const res = await fetch("/api/bio", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -53,6 +62,9 @@ export default function UpgradePage() {
     "rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white placeholder:text-purple-200/30 backdrop-blur-sm outline-none transition-colors focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50";
   const labelClass = "text-sm font-medium text-purple-100/90";
 
+  const purposeLabels = getPurposeLabels(category ?? "artist");
+  const genreLabel = getCreateFieldLabels(category ?? "artist").category2;
+
   return (
     <div className="relative flex flex-1 flex-col items-center overflow-hidden px-6 py-16 font-sans">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_10%,rgba(251,191,36,0.15),transparent_45%),radial-gradient(circle_at_85%_30%,rgba(217,70,239,0.15),transparent_45%)]" />
@@ -63,11 +75,39 @@ export default function UpgradePage() {
         <h1 className="mt-4 bg-gradient-to-r from-amber-300 to-fuchsia-300 bg-clip-text text-3xl font-bold tracking-tight text-transparent">
           Upgrade My Bio
         </h1>
-        <p className="mt-2 text-purple-200/70">
-          Paste your current bio below and tell us where it&apos;ll be used.
-        </p>
 
-        {status === "unauthenticated" && (
+        {!category && (
+          <>
+            <p className="mt-2 text-purple-200/70">This bio is for a(n):</p>
+            <div className="mt-8 grid gap-4 sm:grid-cols-3">
+              {(Object.keys(CATEGORY_LABELS) as Category[]).map((key) => (
+                <button
+                  key={key}
+                  onClick={() => setCategory(key)}
+                  className="rounded-2xl border border-white/10 bg-white/5 p-6 text-left backdrop-blur-sm transition-all hover:border-amber-400/50 hover:bg-white/10"
+                >
+                  <span className="text-lg font-semibold text-white">
+                    {CATEGORY_LABELS[key]}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {category && (
+          <p className="mt-2 text-purple-200/70">
+            Paste your current bio below and tell us where it&apos;ll be used.{" "}
+            <button
+              onClick={() => setCategory(null)}
+              className="text-amber-300 hover:underline"
+            >
+              Change category
+            </button>
+          </p>
+        )}
+
+        {category && status === "unauthenticated" && (
           <div className="mt-8 rounded-2xl border border-amber-400/20 bg-white/5 p-6 backdrop-blur-sm">
             <p className="text-purple-100">Sign in to generate a bio.</p>
             <div className="mt-4 flex gap-3">
@@ -87,7 +127,7 @@ export default function UpgradePage() {
           </div>
         )}
 
-        {status === "authenticated" && !bio && (
+        {category && status === "authenticated" && !bio && (
           <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-5">
             <label className="flex flex-col gap-2">
               <span className={labelClass}>Current bio</span>
@@ -102,11 +142,10 @@ export default function UpgradePage() {
             </label>
 
             <label className="flex flex-col gap-2">
-              <span className={labelClass}>Genre (optional)</span>
+              <span className={labelClass}>{genreLabel} (optional)</span>
               <input
                 value={genre}
                 onChange={(e) => setGenre(e.target.value)}
-                placeholder="e.g. Alt-pop, Hip-hop, Country"
                 className={inputClass}
               />
             </label>
@@ -163,7 +202,7 @@ export default function UpgradePage() {
           </form>
         )}
 
-        {bio && (
+        {bio && category && (
           <div className="mt-8 flex flex-col items-center gap-4">
             <BioResult
               bio={bio}

@@ -77,6 +77,7 @@ export function getCreateFieldLabels(category: Category): CreateFieldLabels {
 
 export interface UpgradeInput {
   mode: "upgrade";
+  category: Category;
   currentBio: string;
   genre?: string;
   purpose: Purpose;
@@ -102,14 +103,15 @@ const SYSTEM_PROMPT = `You are a professional bio writer who has written bios fo
 
 export function buildPrompt(input: BioInput): { system: string; user: string } {
   if (input.mode === "upgrade") {
-    const guidance = getPurposeGuidance("artist", input.purpose);
+    const guidance = getPurposeGuidance(input.category, input.purpose);
+    const fieldLabel = getCreateFieldLabels(input.category).category2;
     const user = `Rewrite and upgrade the following bio into a polished, professional version.
 
 ${guidance}
 
-Keep every true fact from the original bio. Improve structure, flow, word choice, and professionalism. Cut clichés and filler. If a genre or field is given, make sure the tone matches that audience.
+Keep every true fact from the original bio. Improve structure, flow, word choice, and professionalism. Cut clichés and filler. If a ${fieldLabel.toLowerCase()} is given, make sure the tone matches that audience.
 
-Genre / field: ${input.genre || "not specified"}
+${fieldLabel}: ${input.genre || "not specified"}
 Extra notes: ${input.notes || "none"}
 
 CURRENT BIO:
