@@ -27,10 +27,10 @@ export default async function Home() {
 
       <div className="relative w-full max-w-3xl text-center">
         <h1 className="bg-gradient-to-r from-fuchsia-400 via-purple-300 to-cyan-300 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-5xl">
-          Bio Writer for Artists
+          Bio Writer
         </h1>
         <p className="mt-4 text-lg text-purple-200/80">
-          Get a polished, industry-standard artist bio in seconds.
+          Get a polished, professional bio in seconds — for artists, entrepreneurs, and businesses.
         </p>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2">
@@ -57,7 +57,7 @@ export default async function Home() {
             className="group relative flex flex-col items-start gap-3 overflow-hidden rounded-2xl border border-fuchsia-400/20 bg-white/5 p-8 text-left backdrop-blur-sm transition-all hover:border-fuchsia-400/50 hover:bg-white/10"
           >
             <div className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full bg-fuchsia-500/20 blur-2xl transition-opacity group-hover:opacity-90" />
-            <span className="text-3xl">🎤</span>
+            <span className="text-3xl">🚀</span>
             <span className="text-xl font-semibold text-white">
               Create a New Bio
             </span>

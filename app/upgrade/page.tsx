@@ -4,10 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import BioResult from "@/components/BioResult";
-import { PURPOSE_LABELS, type Purpose, type UpgradeInput } from "@/lib/bio-prompt";
+import { getPurposeLabels, type Purpose, type UpgradeInput } from "@/lib/bio-prompt";
 
 export default function UpgradePage() {
   const { data: session, status } = useSession();
+  const purposeLabels = getPurposeLabels("artist");
 
   const [currentBio, setCurrentBio] = useState("");
   const [genre, setGenre] = useState("");
@@ -117,7 +118,7 @@ export default function UpgradePage() {
                 onChange={(e) => setPurpose(e.target.value as Purpose)}
                 className={inputClass}
               >
-                {Object.entries(PURPOSE_LABELS).map(([value, label]) => (
+                {Object.entries(purposeLabels).map(([value, label]) => (
                   <option key={value} value={value} className="bg-[#170f26] text-white">
                     {label}
                   </option>

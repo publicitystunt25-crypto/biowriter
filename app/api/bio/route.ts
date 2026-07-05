@@ -51,9 +51,12 @@ export async function POST(request: Request) {
   if (input.mode === "upgrade" && !input.currentBio?.trim()) {
     return NextResponse.json({ error: "currentBio is required." }, { status: 400 });
   }
-  if (input.mode === "create" && (!input.artistName?.trim() || !input.genre?.trim())) {
+  if (
+    input.mode === "create" &&
+    (!input.artistName?.trim() || !input.genre?.trim() || !input.category)
+  ) {
     return NextResponse.json(
-      { error: "artistName and genre are required." },
+      { error: "category, artistName, and genre are required." },
       { status: 400 }
     );
   }

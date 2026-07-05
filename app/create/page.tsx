@@ -4,10 +4,19 @@ import { useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import BioResult from "@/components/BioResult";
-import { PURPOSE_LABELS, type Purpose, type CreateInput } from "@/lib/bio-prompt";
+import {
+  getPurposeLabels,
+  getCreateFieldLabels,
+  CATEGORY_LABELS,
+  type Purpose,
+  type Category,
+  type CreateInput,
+} from "@/lib/bio-prompt";
 
 export default function CreatePage() {
   const { data: session, status } = useSession();
+
+  const [category, setCategory] = useState<Category | null>(null);
 
   const [artistName, setArtistName] = useState("");
   const [genre, setGenre] = useState("");
@@ -24,12 +33,14 @@ export default function CreatePage() {
   const [errorCode, setErrorCode] = useState<string | null>(null);
 
   const generate = async () => {
+    if (!category) return;
     setLoading(true);
     setError(null);
     setErrorCode(null);
     try {
       const input: CreateInput = {
         mode: "create",
+        category,
         artistName,
         genre,
         hometown,
@@ -66,6 +77,9 @@ export default function CreatePage() {
     "rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white placeholder:text-purple-200/30 backdrop-blur-sm outline-none transition-colors focus:border-fuchsia-400/50 focus:ring-1 focus:ring-fuchsia-400/50";
   const labelClass = "text-sm font-medium text-purple-100/90";
 
+  const fieldLabels = getCreateFieldLabels(category ?? "artist");
+  const purposeLabels = getPurposeLabels(category ?? "artist");
+
   return (
     <div className="relative flex flex-1 flex-col items-center overflow-hidden px-6 py-16 font-sans">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_10%,rgba(217,70,239,0.18),transparent_45%),radial-gradient(circle_at_85%_30%,rgba(34,211,238,0.15),transparent_45%)]" />
@@ -76,12 +90,40 @@ export default function CreatePage() {
         <h1 className="mt-4 bg-gradient-to-r from-fuchsia-300 to-cyan-300 bg-clip-text text-3xl font-bold tracking-tight text-transparent">
           Create a New Bio
         </h1>
-        <p className="mt-2 text-purple-200/70">
-          Answer a few questions and we&apos;ll write an industry-standard bio
-          from scratch.
-        </p>
 
-        {status === "unauthenticated" && (
+        {!category && (
+          <>
+            <p className="mt-2 text-purple-200/70">This bio is for a(n):</p>
+            <div className="mt-8 grid gap-4 sm:grid-cols-3">
+              {(Object.keys(CATEGORY_LABELS) as Category[]).map((key) => (
+                <button
+                  key={key}
+                  onClick={() => setCategory(key)}
+                  className="rounded-2xl border border-white/10 bg-white/5 p-6 text-left backdrop-blur-sm transition-all hover:border-fuchsia-400/50 hover:bg-white/10"
+                >
+                  <span className="text-lg font-semibold text-white">
+                    {CATEGORY_LABELS[key]}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {category && (
+          <p className="mt-2 text-purple-200/70">
+            Answer a few questions and we&apos;ll write a professional bio from
+            scratch.{" "}
+            <button
+              onClick={() => setCategory(null)}
+              className="text-fuchsia-300 hover:underline"
+            >
+              Change category
+            </button>
+          </p>
+        )}
+
+        {category && status === "unauthenticated" && (
           <div className="mt-8 rounded-2xl border border-fuchsia-400/20 bg-white/5 p-6 backdrop-blur-sm">
             <p className="text-purple-100">Sign in to generate a bio.</p>
             <div className="mt-4 flex gap-3">
@@ -101,10 +143,10 @@ export default function CreatePage() {
           </div>
         )}
 
-        {status === "authenticated" && !bio && (
+        {category && status === "authenticated" && !bio && (
           <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-5">
             <label className="flex flex-col gap-2">
-              <span className={labelClass}>Artist / stage name *</span>
+              <span className={labelClass}>{fieldLabels.name} *</span>
               <input
                 required
                 value={artistName}
@@ -114,18 +156,17 @@ export default function CreatePage() {
             </label>
 
             <label className="flex flex-col gap-2">
-              <span className={labelClass}>Genre *</span>
+              <span className={labelClass}>{fieldLabels.category2} *</span>
               <input
                 required
                 value={genre}
                 onChange={(e) => setGenre(e.target.value)}
-                placeholder="e.g. Alt-pop, Hip-hop, Country"
                 className={inputClass}
               />
             </label>
 
             <label className="flex flex-col gap-2">
-              <span className={labelClass}>Hometown (optional)</span>
+              <span className={labelClass}>{fieldLabels.location} (optional)</span>
               <input
                 value={hometown}
                 onChange={(e) => setHometown(e.target.value)}
@@ -134,9 +175,7 @@ export default function CreatePage() {
             </label>
 
             <label className="flex flex-col gap-2">
-              <span className={labelClass}>
-                Career highlights (optional) — releases, streams, press, tours, awards
-              </span>
+              <span className={labelClass}>{fieldLabels.highlights}</span>
               <textarea
                 value={highlights}
                 onChange={(e) => setHighlights(e.target.value)}
@@ -146,7 +185,7 @@ export default function CreatePage() {
             </label>
 
             <label className="flex flex-col gap-2">
-              <span className={labelClass}>Influences / sounds like (optional)</span>
+              <span className={labelClass}>{fieldLabels.influences}</span>
               <input
                 value={influences}
                 onChange={(e) => setInfluences(e.target.value)}
@@ -155,9 +194,7 @@ export default function CreatePage() {
             </label>
 
             <label className="flex flex-col gap-2">
-              <span className={labelClass}>
-                Upcoming releases or shows to mention (optional)
-              </span>
+              <span className={labelClass}>{fieldLabels.upcoming}</span>
               <textarea
                 value={upcoming}
                 onChange={(e) => setUpcoming(e.target.value)}
@@ -173,7 +210,7 @@ export default function CreatePage() {
                 onChange={(e) => setPurpose(e.target.value as Purpose)}
                 className={inputClass}
               >
-                {Object.entries(PURPOSE_LABELS).map(([value, label]) => (
+                {Object.entries(purposeLabels).map(([value, label]) => (
                   <option key={value} value={value} className="bg-[#170f26] text-white">
                     {label}
                   </option>
@@ -216,7 +253,7 @@ export default function CreatePage() {
           </form>
         )}
 
-        {bio && (
+        {bio && category && (
           <div className="mt-8 flex flex-col items-center gap-4">
             <BioResult
               bio={bio}
