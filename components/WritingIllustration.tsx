@@ -1,8 +1,8 @@
 export default function WritingIllustration() {
   return (
     <svg
-      viewBox="0 0 900 700"
-      className="pointer-events-none absolute -right-24 -top-10 h-[640px] w-[820px] opacity-[0.16] sm:opacity-[0.22]"
+      viewBox="0 0 600 600"
+      className="pointer-events-none absolute left-1/2 top-1/2 h-[640px] w-[640px] -translate-x-1/2 -translate-y-1/2 opacity-[0.16] sm:opacity-[0.2]"
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
@@ -13,60 +13,19 @@ export default function WritingIllustration() {
         </linearGradient>
       </defs>
 
-      {/* Notebook page */}
-      <g transform="rotate(-6 450 350)">
-        <rect
-          x="180"
-          y="90"
-          width="520"
-          height="620"
-          rx="24"
-          fill="none"
-          stroke="url(#writing-gradient)"
-          strokeWidth="3"
-        />
-        <line x1="180" y1="190" x2="700" y2="190" stroke="url(#writing-gradient)" strokeWidth="1.5" opacity="0.5" />
+      {/* Handwriting lines on the page */}
+      <path d="M150 450 Q220 432 290 450 T 430 448" stroke="url(#writing-gradient)" strokeWidth="7" fill="none" strokeLinecap="round" />
+      <path d="M155 492 Q215 476 275 494 T 400 490" stroke="url(#writing-gradient)" strokeWidth="7" fill="none" strokeLinecap="round" opacity="0.75" />
+      <path d="M160 532 Q205 518 255 532 T 360 528" stroke="url(#writing-gradient)" strokeWidth="7" fill="none" strokeLinecap="round" opacity="0.55" />
 
-        {/* Abstract handwriting lines */}
-        <path
-          d="M220 260 Q 300 240 360 260 T 500 260 T 640 258"
-          stroke="url(#writing-gradient)"
-          strokeWidth="5"
-          fill="none"
-          strokeLinecap="round"
-          opacity="0.85"
-        />
-        <path
-          d="M220 320 Q 290 300 350 320 T 480 322 T 600 318"
-          stroke="url(#writing-gradient)"
-          strokeWidth="5"
-          fill="none"
-          strokeLinecap="round"
-          opacity="0.7"
-        />
-        <path
-          d="M220 380 Q 310 360 380 382 T 520 380 T 660 378"
-          stroke="url(#writing-gradient)"
-          strokeWidth="5"
-          fill="none"
-          strokeLinecap="round"
-          opacity="0.55"
-        />
-        <path
-          d="M220 440 Q 280 424 340 440 T 460 440 T 560 436"
-          stroke="url(#writing-gradient)"
-          strokeWidth="5"
-          fill="none"
-          strokeLinecap="round"
-          opacity="0.4"
-        />
-      </g>
+      {/* Pen shaft, tip touching the top line */}
+      <line x1="410" y1="150" x2="205" y2="440" stroke="url(#writing-gradient)" strokeWidth="20" strokeLinecap="round" />
+      <path d="M205 440 L 232 418 L 190 470 Z" fill="url(#writing-gradient)" />
 
-      {/* Pen */}
-      <g transform="rotate(38 560 470)">
-        <rect x="540" y="330" width="26" height="230" rx="13" fill="url(#writing-gradient)" opacity="0.9" />
-        <path d="M540 330 L566 330 L553 290 Z" fill="url(#writing-gradient)" opacity="0.9" />
-      </g>
+      {/* Fist gripping the pen shaft */}
+      <rect x="207" y="283" width="140" height="110" rx="45" fill="url(#writing-gradient)" transform="rotate(-55 277 338)" />
+      {/* Thumb wrapping over the near side */}
+      <rect x="200" y="278" width="82" height="48" rx="24" fill="url(#writing-gradient)" transform="rotate(-80 241 302)" />
     </svg>
   );
 }
