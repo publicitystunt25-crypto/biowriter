@@ -11,6 +11,12 @@ export interface BioMeta {
   artistName?: string;
 }
 
+function computeTitle(meta: BioMeta): string {
+  return meta.mode === "create" && meta.artistName
+    ? meta.artistName
+    : `Bio — ${new Date().toLocaleDateString()}`;
+}
+
 export default function BioResult({
   bio,
   onRegenerate,
@@ -27,6 +33,8 @@ export default function BioResult({
   const [copied, setCopied] = useState(false);
   const [showUpsell, setShowUpsell] = useState(false);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [downloadState, setDownloadState] = useState<"idle" | "working" | "error">("idle");
+  const [downloadError, setDownloadError] = useState<string | null>(null);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(bio);
@@ -42,11 +50,6 @@ export default function BioResult({
 
     setSaveState("saving");
     try {
-      const title =
-        meta.mode === "create"
-          ? meta.artistName
-          : `Bio — ${new Date().toLocaleDateString()}`;
-
       const res = await fetch("/api/bios", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -55,7 +58,7 @@ export default function BioResult({
           mode: meta.mode,
           purpose: meta.purpose,
           genre: meta.genre,
-          title,
+          title: computeTitle(meta),
         }),
       });
       if (!res.ok) throw new Error();
@@ -63,6 +66,44 @@ export default function BioResult({
       setTimeout(() => setSaveState("idle"), 2000);
     } catch {
       setSaveState("error");
+    }
+  };
+
+  const handleDownload = async () => {
+    setDownloadState("working");
+    setDownloadError(null);
+    try {
+      if (plan === "pro") {
+        const res = await fetch("/api/pdf/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content: bio, title: computeTitle(meta) }),
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          throw new Error(data.error || "Something went wrong.");
+        }
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "bio.pdf";
+        a.click();
+        URL.revokeObjectURL(url);
+        setDownloadState("idle");
+      } else {
+        const res = await fetch("/api/stripe/checkout-download", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content: bio, title: computeTitle(meta) }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Something went wrong.");
+        window.location.href = data.url;
+      }
+    } catch (err) {
+      setDownloadState("error");
+      setDownloadError(err instanceof Error ? err.message : "Something went wrong.");
     }
   };
 
@@ -104,6 +145,19 @@ export default function BioResult({
               ? "Saved ✓"
               : "Save This Bio"}
         </button>
+        <button
+          onClick={handleDownload}
+          disabled={downloadState === "working"}
+          className="rounded-full bg-gradient-to-r from-amber-400 to-fuchsia-500 px-5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+        >
+          {downloadState === "working"
+            ? plan === "pro"
+              ? "Preparing PDF..."
+              : "Redirecting to payment..."
+            : plan === "pro"
+              ? "Download This Bio"
+              : "Download This Bio — $1"}
+        </button>
       </div>
 
       {showUpsell && (
@@ -122,6 +176,9 @@ export default function BioResult({
 
       {saveState === "error" && (
         <p className="mt-4 text-sm text-red-400">Something went wrong saving this bio. Try again.</p>
+      )}
+      {downloadState === "error" && (
+        <p className="mt-4 text-sm text-red-400">{downloadError}</p>
       )}
     </div>
   );
