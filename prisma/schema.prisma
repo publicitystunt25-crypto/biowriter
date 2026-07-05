@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Plan {
+  free
+  pro
+}
+
+enum BioMode {
+  upgrade
+  create
+}
+
+enum Purpose {
+  press
+  streaming
+  social
+}
+
+model User {
+  id                   String   @id @default(cuid())
+  email                String   @unique
+  passwordHash         String
+  plan                 Plan     @default(free)
+  stripeCustomerId     String?  @unique
+  stripeSubscriptionId String?  @unique
+  freeBiosGenerated    Int      @default(0)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  savedBios        SavedBio[]
+  pendingDownloads PendingDownload[]
+}
+
+model SavedBio {
+  id        String   @id @default(cuid())
+  userId    String
+  content   String   @db.Text
+  mode      BioMode
+  purpose   Purpose
+  title     String?
+  genre     String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// Bridges the redirect to Stripe Checkout and back for the $1 pay-per-download flow.
+// A Free user's bio text is never saved anywhere else, so this is the only place
+// it survives the round trip to Stripe.
+model PendingDownload {
+  id              String   @id @default(cuid())
+  stripeSessionId String   @unique
+  userId          String
+  bioContent      String   @db.Text
+  title           String?
+  status          String   @default("pending") // pending | paid | consumed
+  createdAt       DateTime @default(now())
+  expiresAt       DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([stripeSessionId])
+}

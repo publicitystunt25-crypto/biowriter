@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import BioResult from "@/components/BioResult";
 import { PURPOSE_LABELS, type Purpose, type UpgradeInput } from "@/lib/bio-prompt";
 
 export default function UpgradePage() {
+  const { data: session, status } = useSession();
+
   const [currentBio, setCurrentBio] = useState("");
   const [genre, setGenre] = useState("");
   const [purpose, setPurpose] = useState<Purpose>("press");
@@ -14,10 +17,12 @@ export default function UpgradePage() {
   const [bio, setBio] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
 
   const generate = async () => {
     setLoading(true);
     setError(null);
+    setErrorCode(null);
     try {
       const input: UpgradeInput = { mode: "upgrade", currentBio, genre, purpose, notes };
       const res = await fetch("/api/bio", {
@@ -26,7 +31,10 @@ export default function UpgradePage() {
         body: JSON.stringify(input),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Something went wrong.");
+      if (!res.ok) {
+        setErrorCode(data.code ?? null);
+        throw new Error(data.error || "Something went wrong.");
+      }
       setBio(data.bio);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
@@ -58,7 +66,27 @@ export default function UpgradePage() {
           Paste your current bio below and tell us where it&apos;ll be used.
         </p>
 
-        {!bio && (
+        {status === "unauthenticated" && (
+          <div className="mt-8 rounded-2xl border border-amber-400/20 bg-white/5 p-6 backdrop-blur-sm">
+            <p className="text-purple-100">Sign in to generate a bio.</p>
+            <div className="mt-4 flex gap-3">
+              <Link
+                href="/login"
+                className="rounded-full bg-gradient-to-r from-amber-400 to-fuchsia-500 px-5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+              >
+                Log In
+              </Link>
+              <Link
+                href="/signup"
+                className="rounded-full border border-white/15 px-5 py-2 text-sm font-medium text-purple-100 transition-colors hover:bg-white/10"
+              >
+                Sign Up
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {status === "authenticated" && !bio && (
           <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-5">
             <label className="flex flex-col gap-2">
               <span className={labelClass}>Current bio</span>
@@ -109,7 +137,20 @@ export default function UpgradePage() {
               />
             </label>
 
-            {error && <p className="text-sm text-red-400">{error}</p>}
+            {error && errorCode === "FREE_LIMIT_REACHED" && (
+              <div className="rounded-xl border border-fuchsia-400/30 bg-fuchsia-500/10 p-4">
+                <p className="text-sm text-purple-100">{error}</p>
+                <Link
+                  href="/account"
+                  className="mt-3 inline-block rounded-full bg-gradient-to-r from-amber-400 to-fuchsia-500 px-5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+                >
+                  Upgrade to Pro
+                </Link>
+              </div>
+            )}
+            {error && errorCode !== "FREE_LIMIT_REACHED" && (
+              <p className="text-sm text-red-400">{error}</p>
+            )}
 
             <button
               type="submit"
