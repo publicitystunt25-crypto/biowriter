@@ -30,17 +30,10 @@ export default function BioResult({
   plan: "free" | "pro";
   meta: BioMeta;
 }) {
-  const [copied, setCopied] = useState(false);
   const [showUpsell, setShowUpsell] = useState(false);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [downloadState, setDownloadState] = useState<"idle" | "working" | "error">("idle");
   const [downloadError, setDownloadError] = useState<string | null>(null);
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(bio);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  };
 
   const handleSave = async () => {
     if (plan !== "pro") {
@@ -117,16 +110,16 @@ export default function BioResult({
         </h2>
         <span className="text-xs text-purple-200/50">{wordCount} words</span>
       </div>
-      <p className="whitespace-pre-wrap text-base leading-7 text-purple-50">
+      <p
+        className="whitespace-pre-wrap text-base leading-7 text-purple-50 select-none"
+        onCopy={(e) => e.preventDefault()}
+        onCut={(e) => e.preventDefault()}
+        onContextMenu={(e) => e.preventDefault()}
+        onDragStart={(e) => e.preventDefault()}
+      >
         {bio}
       </p>
       <div className="mt-6 flex flex-wrap gap-3">
-        <button
-          onClick={handleCopy}
-          className="rounded-full bg-gradient-to-r from-fuchsia-500 to-cyan-500 px-5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
-        >
-          {copied ? "Copied!" : "Copy Bio"}
-        </button>
         <button
           onClick={onRegenerate}
           disabled={regenerating}
