@@ -164,7 +164,13 @@ export default function UpgradePage() {
 
         {bio && (
           <div className="mt-8 flex flex-col items-center gap-4">
-            <BioResult bio={bio} onRegenerate={generate} regenerating={loading} />
+            <BioResult
+              bio={bio}
+              onRegenerate={generate}
+              regenerating={loading}
+              plan={session?.user?.plan ?? "free"}
+              meta={{ mode: "upgrade", purpose, genre }}
+            />
             <button
               onClick={() => setBio(null)}
               className="text-sm text-purple-300/70 hover:text-amber-300 hover:underline"

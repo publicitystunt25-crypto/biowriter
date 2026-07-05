@@ -1,9 +1,21 @@
 import { auth, signOut } from "@/auth";
 import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 
 export default async function AccountPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
+
+  const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+  if (!user) redirect("/login");
+
+  const savedBios =
+    user.plan === "pro"
+      ? await prisma.savedBio.findMany({
+          where: { userId: user.id },
+          orderBy: { createdAt: "desc" },
+        })
+      : [];
 
   return (
     <div className="relative flex flex-1 flex-col items-center overflow-hidden px-6 py-16 font-sans">
@@ -15,10 +27,48 @@ export default async function AccountPage() {
 
         <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
           <p className="text-sm text-purple-200/70">Signed in as</p>
-          <p className="text-lg font-medium text-white">{session.user.email}</p>
+          <p className="text-lg font-medium text-white">{user.email}</p>
           <p className="mt-4 text-sm text-purple-200/70">Plan</p>
-          <p className="text-lg font-medium capitalize text-white">{session.user.plan}</p>
+          <p className="text-lg font-medium capitalize text-white">{user.plan}</p>
         </div>
+
+        {user.plan === "pro" ? (
+          <div className="mt-8">
+            <h2 className="text-lg font-semibold text-white">Saved Bios</h2>
+            {savedBios.length === 0 ? (
+              <p className="mt-2 text-sm text-purple-200/70">
+                You haven&apos;t saved any bios yet.
+              </p>
+            ) : (
+              <div className="mt-4 flex flex-col gap-3">
+                {savedBios.map((saved) => (
+                  <div
+                    key={saved.id}
+                    className="rounded-xl border border-white/10 bg-white/5 p-4"
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium text-white">
+                        {saved.title || `${saved.genre ?? "Bio"}`}
+                      </p>
+                      <span className="text-xs text-purple-200/50">
+                        {saved.createdAt.toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className="mt-2 line-clamp-2 text-sm text-purple-200/70">
+                      {saved.content}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="mt-8 rounded-2xl border border-fuchsia-400/30 bg-fuchsia-500/10 p-6">
+            <p className="text-sm text-purple-100">
+              Upgrade to Pro for $4.99/mo to save unlimited bios and generate without limits.
+            </p>
+          </div>
+        )}
 
         <form
           action={async () => {

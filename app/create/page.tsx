@@ -218,7 +218,13 @@ export default function CreatePage() {
 
         {bio && (
           <div className="mt-8 flex flex-col items-center gap-4">
-            <BioResult bio={bio} onRegenerate={generate} regenerating={loading} />
+            <BioResult
+              bio={bio}
+              onRegenerate={generate}
+              regenerating={loading}
+              plan={session?.user?.plan ?? "free"}
+              meta={{ mode: "create", purpose, genre, artistName }}
+            />
             <button
               onClick={() => setBio(null)}
               className="text-sm text-purple-300/70 hover:text-fuchsia-300 hover:underline"
