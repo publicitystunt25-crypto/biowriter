@@ -1,6 +1,7 @@
 import { auth, signOut } from "@/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { UpgradeButton, ManageBillingButton } from "@/components/AccountActions";
 
 export default async function AccountPage() {
   const session = await auth();
@@ -30,6 +31,7 @@ export default async function AccountPage() {
           <p className="text-lg font-medium text-white">{user.email}</p>
           <p className="mt-4 text-sm text-purple-200/70">Plan</p>
           <p className="text-lg font-medium capitalize text-white">{user.plan}</p>
+          {user.plan === "pro" ? <ManageBillingButton /> : <UpgradeButton />}
         </div>
 
         {user.plan === "pro" ? (

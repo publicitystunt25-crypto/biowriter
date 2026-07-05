@@ -18,3 +18,13 @@ services:
         value: https://bio-rewriter.onrender.com
       - key: ADMIN_EMAILS
         sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PRICE_ID_PRO
+        sync: false
+      - key: STRIPE_PRICE_ID_PDF_DOWNLOAD
+        sync: false
