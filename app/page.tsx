@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { auth } from "@/auth";
+import WritingIllustration from "@/components/WritingIllustration";
 
 export default async function Home() {
   const session = await auth();
@@ -7,6 +8,7 @@ export default async function Home() {
   return (
     <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-6 py-16 font-sans">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(217,70,239,0.25),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(99,102,241,0.28),transparent_45%),radial-gradient(circle_at_50%_100%,rgba(34,211,238,0.18),transparent_50%)]" />
+      <WritingIllustration />
 
       <div className="absolute right-6 top-6 text-sm">
         {session?.user ? (
@@ -27,7 +29,7 @@ export default async function Home() {
 
       <div className="relative w-full max-w-3xl text-center">
         <h1 className="bg-gradient-to-r from-fuchsia-400 via-purple-300 to-cyan-300 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-5xl">
-          Bio Writer
+          BioDraft
         </h1>
         <p className="mt-4 text-lg text-purple-200/80">
           Get a polished, professional bio in seconds — for artists, entrepreneurs, and businesses.

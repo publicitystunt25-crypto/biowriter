@@ -35,7 +35,7 @@ export function BioDocument({ title, content }: { title: string; content: string
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.body}>{content}</Text>
         </View>
-        <Text style={styles.footer}>Generated with Bio Writer for Artists</Text>
+        <Text style={styles.footer}>Generated with BioDraft</Text>
       </Page>
     </Document>
   );

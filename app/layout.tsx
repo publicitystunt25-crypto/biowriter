@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Bio Writer",
+  title: "BioDraft",
   description: "Upgrade or create a professional bio for artists, entrepreneurs, and businesses.",
 };
 
