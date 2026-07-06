@@ -33,13 +33,12 @@ export default async function AdminPage() {
     redirect("/");
   }
 
-  const [totalUsers, proUsers, recentSignups, savedBios, revenue] = await Promise.all([
+  const [totalUsers, proUsers, allUsers, savedBios, revenue] = await Promise.all([
     prisma.user.count(),
     prisma.user.count({ where: { plan: "pro" } }),
     prisma.user.findMany({
       orderBy: { createdAt: "desc" },
-      take: 25,
-      select: { email: true, plan: true, createdAt: true },
+      select: { email: true, plan: true, createdAt: true, stripeSubscriptionId: true },
     }),
     prisma.savedBio.findMany({
       orderBy: { createdAt: "desc" },
@@ -55,9 +54,17 @@ export default async function AdminPage() {
     <div className="relative flex flex-1 flex-col items-center overflow-hidden px-6 py-16 font-sans">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_10%,rgba(217,70,239,0.18),transparent_45%),radial-gradient(circle_at_85%_30%,rgba(34,211,238,0.15),transparent_45%)]" />
       <div className="relative w-full max-w-4xl">
-        <h1 className="bg-gradient-to-r from-fuchsia-300 to-cyan-300 bg-clip-text text-3xl font-bold tracking-tight text-transparent">
-          Admin Dashboard
-        </h1>
+        <div className="flex items-center justify-between">
+          <h1 className="bg-gradient-to-r from-fuchsia-300 to-cyan-300 bg-clip-text text-3xl font-bold tracking-tight text-transparent">
+            Admin Dashboard
+          </h1>
+          <a
+            href="/api/admin/export-users"
+            className="rounded-full bg-gradient-to-r from-fuchsia-500 to-cyan-500 px-5 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+          >
+            Export Emails (CSV)
+          </a>
+        </div>
 
         <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
@@ -79,23 +86,40 @@ export default async function AdminPage() {
         </div>
 
         <div className="mt-10">
-          <h2 className="text-lg font-semibold text-white">Recent Signups</h2>
-          <div className="mt-4 overflow-hidden rounded-2xl border border-white/10">
+          <h2 className="text-lg font-semibold text-white">
+            Accounts ({allUsers.length})
+          </h2>
+          <div className="mt-4 max-h-[480px] overflow-y-auto rounded-2xl border border-white/10">
             <table className="w-full text-left text-sm">
-              <thead className="bg-white/5 text-purple-200/70">
+              <thead className="sticky top-0 bg-[#170f26] text-purple-200/70">
                 <tr>
                   <th className="px-4 py-2 font-medium">Email</th>
                   <th className="px-4 py-2 font-medium">Plan</th>
                   <th className="px-4 py-2 font-medium">Signed Up</th>
+                  <th className="px-4 py-2 font-medium">Subscription</th>
                 </tr>
               </thead>
               <tbody>
-                {recentSignups.map((u) => (
+                {allUsers.map((u) => (
                   <tr key={u.email} className="border-t border-white/10">
                     <td className="px-4 py-2 text-white">{u.email}</td>
                     <td className="px-4 py-2 capitalize text-purple-100">{u.plan}</td>
                     <td className="px-4 py-2 text-purple-200/70">
                       {u.createdAt.toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-2">
+                      {u.plan === "pro" && u.stripeSubscriptionId ? (
+                        <a
+                          href={`https://dashboard.stripe.com/subscriptions/${u.stripeSubscriptionId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-cyan-300 hover:underline"
+                        >
+                          Active →
+                        </a>
+                      ) : (
+                        <span className="text-purple-200/50">—</span>
+                      )}
                     </td>
                   </tr>
                 ))}
